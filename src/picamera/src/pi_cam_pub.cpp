@@ -5,10 +5,10 @@
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "webcam_image");
+  ros::init(argc, argv, "rpicam_image");
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
-  image_transport::Publisher webcam_pub = it.advertise("webcam/image", 1);
+  image_transport::Publisher webcam_pub = it.advertise("rpicam/image", 1);
 
   cv::VideoCapture cap(0);
   // Check if video device can be opened with the given index
