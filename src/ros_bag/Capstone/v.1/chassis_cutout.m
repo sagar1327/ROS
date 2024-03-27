@@ -95,12 +95,17 @@ hold off;
 clc;clear;close all
 load("camera_params.mat")
 load("Data.mat")
-sub = rossubscriber("/tracking","sensor_msgs/Image","DataFormat","struct");
+sub1 = rossubscriber("/tracking","sensor_msgs/Image","DataFormat","struct");
+sub2 = rossubscriber("/qvio/pose", "geometry_msgs/PoseStamped", "DataFormat", "struct");
+qvio_height = [];
 i = 1;
 figure(1)
-while true
+pause(5)
+disp('Starting...')
+
+while rosshutdown
     chk = [];
-    msg = receive(sub);
+    msg = receive(sub1);
     img = rosReadImage(msg);
     img = undistortFisheyeImage(img,Params.Intrinsics);
     T = adaptthresh(img,"Statistic","gaussian");
@@ -146,6 +151,12 @@ while true
     normalized_dist(i) = (distBetweenChassisCutouts - min_dist)/max_dist;
     height(i) = spline(spline_curve,query_points,normalized_dist(i));
     fprintf("Current height: %.4f\n",height(i))
+
+    if ~isempty(sub2.LatestMessage)
+        qvio_height(i,1) = sub2.LatestMessage.Pose.Position.Z;
+    else
+        qvio_height(i,1) = NaN;
+    end
 
     imshow(mask);
     hold on
